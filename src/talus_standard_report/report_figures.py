@@ -1,12 +1,14 @@
 """src/talus_standard_report/unique_peptides_proteins_figure.py"""
 from typing import Tuple
+
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import shortuuid
 import streamlit as st
-import plotly.express as px
+
 from plotly.graph_objects import Figure
-from talus_utils.dataframe import copy, drop_na, pivot_table, log_scaling
+from talus_utils.dataframe import copy, drop_na, log_scaling, pivot_table
 
 from talus_standard_report.constants import PRIMARY_COLOR
 
@@ -200,7 +202,7 @@ class PeptideIntensitiesScatterMatrixFigure(ReportFigureAbstractClass):
             self._figure = self.get_figure(
                 df=self._data,
                 color=PRIMARY_COLOR,
-                opacity=opacity/100,
+                opacity=opacity / 100,
             )
             st.write(self._figure)
             self._description = st.text_area(

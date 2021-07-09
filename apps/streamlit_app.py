@@ -2,11 +2,11 @@
 import streamlit as st
 
 from numpy.lib.function_base import place
-from talus_standard_report.constants import PRIMARY_COLOR, SECONDARY_COLOR
 
 import talus_standard_report.data_loader as data_loader
 
 from talus_standard_report.components import CustomProteinUploader
+from talus_standard_report.constants import PRIMARY_COLOR, SECONDARY_COLOR
 from talus_standard_report.report_figures import (
     HitSelectionFigure,
     NuclearProteinOverlapFigure,
