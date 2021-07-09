@@ -1,5 +1,6 @@
 """Test cases for the __main__ module."""
 import pytest
+
 from click.testing import CliRunner
 
 from talus_standard_report import __main__

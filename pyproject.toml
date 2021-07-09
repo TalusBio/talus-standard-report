@@ -21,10 +21,10 @@ Changelog = "https://github.com/rmeinl/talus-standard-report/releases"
 python = ">=3.7.1,<4.0.0"
 streamlit = "^0.79.0"
 watchdog = "^2.0.2"
-talus-utils = "^0.0.0"
-talus-aws-utils = "^0.0.0"
+talus-utils = "0.0.1"
 boto3 = "^1.17.107"
 shortuuid = "^1.0.1"
+plotly = "^5.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"

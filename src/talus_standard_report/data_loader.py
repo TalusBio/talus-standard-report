@@ -1,9 +1,12 @@
 """src/talus_standard_report/data_loader.py"""
+import numpy as np
 import pandas as pd
 import streamlit as st
+
 from botocore.exceptions import ClientError
 
-# from talus_aws_utils.s3 import read_dataframe
+
+# from talus_aws_utils.s3 import read_dataframe, read_numpy_array
 
 # from .constants import ENCYCLOPEDIA_BUCKET
 
@@ -39,3 +42,15 @@ def get_quant_proteins(dataset: str):
 def get_quant_peptides(dataset: str):
     return pd.read_csv("data/RESULTS-quant.elib.peptides.txt", sep="\t")
     # return read_dataframe(bucket=ENCYCLOPEDIA_BUCKET, key=f"wide/{dataset}/RESULTS-quant.elib.peptides.txt")
+
+
+@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+def get_quant_peptides_pca_reduced(dataset: str):
+    return pd.read_parquet("data/quant_peptides_pca_reduced.parquet")
+    # return read_dataframe(bucket=ENCYCLOPEDIA_BUCKET, key=f"wide/{dataset}/quant_peptides_pca_reduced.parquet")
+
+
+@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+def get_quant_peptides_pca_components(dataset: str):
+    return np.load("data/quant_peptides_pca_components.npy")
+    # return read_numpy_array(bucket=ENCYCLOPEDIA_BUCKET, key=f"wide/{dataset}/quant_peptides_pca_components.npy")

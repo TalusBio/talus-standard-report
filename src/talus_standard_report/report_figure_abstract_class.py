@@ -1,9 +1,6 @@
 """src/talus_standard_report/report_figure.py"""
-from abc import ABC
-from abc import abstractmethod
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from abc import ABC, abstractmethod
+from typing import Optional, Tuple, Union
 
 import pandas as pd
 import streamlit as st
@@ -24,6 +21,8 @@ class ReportFigureAbstractClass(ABC):
         dataset_name: str,
         data: Union[pd.DataFrame, Tuple[pd.DataFrame, pd.DataFrame]],
         description_placeholder: Union[str, Tuple[str, str]],
+        width: int,
+        height: int,
         subheader: Union[Optional[str], Optional[Tuple[str, str]]] = None,
     ):
         """The init method for the ReportFigure abstract class.
@@ -41,6 +40,8 @@ class ReportFigureAbstractClass(ABC):
         self._dataset_name = dataset_name
         self._data = data
         self._description_placeholder = description_placeholder
+        self._width = width
+        self._height = height
         self._subheader = subheader
         self._figure = None
         self._description = None
@@ -68,6 +69,16 @@ class ReportFigureAbstractClass(ABC):
     def description(self):
         """Getter for description."""
         return self._description
+
+    @property
+    def width(self):
+        """Getter for width."""
+        return self._width
+
+    @property
+    def height(self):
+        """Getter for height."""
+        return self._height
 
     @property
     def figure(self):

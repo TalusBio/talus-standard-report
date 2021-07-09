@@ -2,20 +2,20 @@
 import pandas as pd
 import shortuuid
 import streamlit as st
+
 from talus_utils.fasta import parse_fasta_header_uniprot_entry
 
 
 class CustomProteinUploader:
     def __init__(self):
         self._uploaded_files = []
-        self._data = None
+        self._data = set()
 
     def display(self):
         st.sidebar.header("Custom Protein List")
         self._uploaded_files = st.sidebar.file_uploader(
             "Choose a file (.csv)", accept_multiple_files=True
         )
-        self._data = set()
         for uploaded_file in self._uploaded_files:
             custom_df = pd.read_csv(uploaded_file, sep=None)
             st.sidebar.write(uploaded_file.name)
