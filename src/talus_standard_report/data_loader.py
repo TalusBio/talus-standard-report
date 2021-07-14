@@ -208,7 +208,7 @@ def get_nuclear_proteins() -> pd.DataFrame:
         if st.secrets.get("LOCAL_MODE"):
             return pd.read_csv("data/nuclear_proteins.csv")
         else:
-            read_dataframe(bucket=COLLECTIONS_BUCKET, key="nuclear_proteins.csv")
+            return read_dataframe(bucket=COLLECTIONS_BUCKET, key="nuclear_proteins.csv")
     except ValueError:
         return pd.DataFrame()
 
@@ -231,7 +231,7 @@ def get_expected_fractions_of_locations() -> pd.DataFrame:
         if st.secrets.get("LOCAL_MODE"):
             return pd.read_parquet("data/expected_fractions_of_locations.parquet")
         else:
-            read_dataframe(
+            return read_dataframe(
                 bucket=COLLECTIONS_BUCKET, key="expected_fractions_of_locations.parquet"
             )
     except ValueError:
