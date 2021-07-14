@@ -256,6 +256,8 @@ def get_protein_locations() -> pd.DataFrame:
         if st.secrets.get("LOCAL_MODE"):
             return pd.read_parquet("data/protein_locations.parquet")
         else:
-            read_dataframe(bucket=COLLECTIONS_BUCKET, key="protein_locations.parquet")
+            return read_dataframe(
+                bucket=COLLECTIONS_BUCKET, key="protein_locations.parquet"
+            )
     except ValueError:
         return pd.DataFrame()
