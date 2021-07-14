@@ -1832,7 +1832,7 @@ pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
 name = "streamlit"
-version = "0.80.0"
+version = "0.81.1"
 description = "The fastest way to build data apps in Python"
 category = "main"
 optional = false
@@ -2146,7 +2146,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<4.0.0"
-content-hash = "6b8804637d79224f7c5b15388de1e1b686e59087fad6aa64b4ff58fa9654d23f"
+content-hash = "4f03b6c69adeb736db4133020ea0a12de2d79e4b15674e11eee21b950f01ef50"
 
 [metadata.files]
 alabaster = [
@@ -3320,8 +3320,8 @@ stevedore = [
     {file = "stevedore-3.3.0.tar.gz", hash = "sha256:3a5bbd0652bf552748871eaa73a4a8dc2899786bc497a2aa1fcb4dcdb0debeee"},
 ]
 streamlit = [
-    {file = "streamlit-0.80.0-py2.py3-none-any.whl", hash = "sha256:156051dd1b2233d9cfa1d512edec8284567aa44def13cc228034e032bbb47d85"},
-    {file = "streamlit-0.80.0.tar.gz", hash = "sha256:a67951245581bacce377bc33965890afe9170dc782d9ae4fcfc5fc05ace59013"},
+    {file = "streamlit-0.81.1-py2.py3-none-any.whl", hash = "sha256:250bfe530729ceea642dd0f7380225eb413d339739e6c25342d2c46c24154819"},
+    {file = "streamlit-0.81.1.tar.gz", hash = "sha256:ab219980abe8da8f799eb92514c805ec7521c1a603f411af090cc44cd0fdc944"},
 ]
 talus-aws-utils = [
     {file = "talus-aws-utils-0.0.1.tar.gz", hash = "sha256:80967b5507d49af86272b3024150cdc06076252faebf536e1180b823c70734a9"},
