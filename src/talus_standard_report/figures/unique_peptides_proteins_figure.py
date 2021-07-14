@@ -60,7 +60,7 @@ class UniquePeptidesProteinsFigure(ReportFigureAbstractClass):
             data=[
                 go.Bar(
                     name="Unique Proteins",
-                    x=df["Sample"],
+                    x=df["Sample Name"],
                     y=df["Unique Proteins"],
                     marker_color=color_proteins,
                     yaxis="y",
@@ -68,7 +68,7 @@ class UniquePeptidesProteinsFigure(ReportFigureAbstractClass):
                 ),
                 go.Bar(
                     name="Unique Peptides",
-                    x=df["Sample"],
+                    x=df["Sample Name"],
                     y=df["Unique Peptides"],
                     marker_color=color_peptides,
                     yaxis="y2",
