@@ -5,6 +5,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import talus_utils.plot as plot_utils
+
+from sklearn.decomposition import PCA
+from toolz.functoolz import curry, thread_first
 
 from talus_standard_report.constants import PRIMARY_COLOR
 from talus_standard_report.utils import get_table_download_link
@@ -17,6 +21,7 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
 
     def __init__(
         self,
+        pca_model: PCA,
         *args,
         **kwargs,
     ):
@@ -24,6 +29,7 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
             *args,
             **kwargs,
         )
+        self._pca_model = pca_model
 
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the data for plotting.
@@ -82,7 +88,15 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
             if self._subheader:
                 st.subheader(self._subheader)
 
-            self._figure = self.get_figure(
+            self._figure = thread_first(
+                self.get_figure,
+                curry(
+                    plot_utils.update_layout(
+                        xaxis_title=f"Principal Component 1 ({self._pca_model.explained_variance_ratio_[0]*100:.2f}%)",
+                        yaxis_title=f"Principal Component 2 ({self._pca_model.explained_variance_ratio_[1]*100:.2f}%)",
+                    )
+                ),
+            )(
                 df=self._data,
                 color=PRIMARY_COLOR,
             )

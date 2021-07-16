@@ -12,7 +12,11 @@ from talus_standard_report.components.custom_protein_uploader import (
     CustomProteinUploader,
 )
 from talus_standard_report.components.dataset_choice import DatasetChoice
-from talus_standard_report.constants import ENCYCLOPEDIA_BUCKET, SELECTBOX_DEFAULT
+from talus_standard_report.constants import (
+    ENCYCLOPEDIA_BUCKET,
+    SELECTBOX_DEFAULT,
+    STANDARD_REPORT_TITLE,
+)
 from talus_standard_report.figures.file_size_dataframe import FileSizeDataFrame
 from talus_standard_report.figures.hit_selection_figure import HitSelectionFigure
 from talus_standard_report.figures.nuclear_protein_overlap_figure import (
@@ -42,11 +46,11 @@ from talus_standard_report.figures.subcellular_location_enrichment_figure import
 from talus_standard_report.figures.unique_peptides_proteins_figure import (
     UniquePeptidesProteinsFigure,
 )
-from talus_standard_report.utils import streamlit_static_downloads_folder
+from talus_standard_report.utils import PDF, streamlit_static_downloads_folder
 
 
 st.set_page_config(
-    page_title="Talus Standard Report",
+    page_title=STANDARD_REPORT_TITLE,
     page_icon=":bar_chart:",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -55,7 +59,7 @@ st.set_page_config(
 
 def main() -> None:
     """Talus Standard Report."""
-    st.title("Talus Standard Report")
+    st.title(STANDARD_REPORT_TITLE)
 
     st.sidebar.header("Options")
     dataset_chooser = DatasetChoice(
@@ -84,15 +88,14 @@ def main() -> None:
     peptide_proteins_normalized = data_loader.get_peptide_proteins_normalized(
         dataset=dataset
     )
+
     unique_peptides_proteins = data_loader.get_unique_peptides_proteins(dataset=dataset)
     quant_proteins = data_loader.get_quant_proteins(dataset=dataset)
     quant_peptides = data_loader.get_quant_peptides(dataset=dataset)
     quant_peptides_pca_reduced = data_loader.get_quant_peptides_pca_reduced(
         dataset=dataset
     )
-    quant_peptides_pca_components = data_loader.get_quant_peptides_pca_components(
-        dataset=dataset
-    )
+    quant_peptides_pca = data_loader.get_quant_peptides_pca(dataset=dataset)
 
     nuclear_proteins = data_loader.get_nuclear_proteins()
     protein_locations = data_loader.get_protein_locations()
@@ -246,11 +249,12 @@ def main() -> None:
                 description_placeholder="A PCA (Principal Component Analysis) Plot where for each sample/bio replicate the peptide intensity was reduced to two principal components. Samples that are closer together are more similar, samples that are farther apart less so. Most ideally we'll see similar replicates/treatments clustered together. If not, there could have potentially been batch effects. The input data to the PCA algorithm were the raw, unnormalized intensities.",
                 width=750,
                 height=750,
+                pca_model=quant_peptides_pca,
                 downloads_path=downloads_path,
             ),
         ),
         (
-            quant_peptides_pca_components.size != 0,
+            quant_peptides_pca != "",
             PeptideIntensitiesClustergram(
                 title="Clustergram Plot mapping the log10 Peptide Intensities for each Sample",
                 short_title="Peptide Intensities Clustergram",
@@ -259,7 +263,7 @@ def main() -> None:
                 description_placeholder="A clustergram showing the top {} log10 peptide intensities (y-axis) for each sample/bio replicate (x-axis) sorted by: {}. The dendrograms on each side cluster the data by peptides and sample similarity on the y- and x-axis respectively. The cluster method used is single linkage.",
                 width=750,
                 height=1000,
-                pca_components=quant_peptides_pca_components,
+                pca_model=quant_peptides_pca,
                 file_to_condition=file_to_condition,
                 downloads_path=downloads_path,
             ),
@@ -279,6 +283,17 @@ def main() -> None:
 
     for figure in figures:
         figure.display()
+
+    if st.button("Export to PDF"):
+        with st.spinner(text="Loading"):
+            pdf = PDF()
+            pdf.set_title(STANDARD_REPORT_TITLE)
+            for figure in figures:
+                if figure.is_active:
+                    pdf.print_figure(figure=figure, write_directory_path=downloads_path)
+
+            html = pdf.get_html_download_link()
+            st.markdown(html, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

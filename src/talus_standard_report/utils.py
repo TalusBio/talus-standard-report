@@ -1,12 +1,22 @@
 """src/talus_standard_report/utils.py module."""
+import base64
 import os
 import uuid
 
 from pathlib import Path
 from shutil import rmtree
+from typing import Optional
 
+import dataframe_image as df_image
+import inflection
 import pandas as pd
 import streamlit as st
+
+from fpdf import FPDF
+
+from talus_standard_report.figures.report_figure_abstract_class import (
+    ReportFigureAbstractClass,
+)
 
 
 def streamlit_static_downloads_folder() -> Path:
@@ -45,3 +55,109 @@ def get_table_download_link(df: pd.DataFrame, downloads_path: Path) -> str:
     temp_file_path = downloads_path.joinpath(f"{str(uuid.uuid4())}.csv")
     df.to_csv(temp_file_path)
     return f"[Download as .csv file](downloads/{os.path.basename(temp_file_path)})"
+
+
+class PDF(FPDF):
+    """A PDF class that can be used to create a Streamlit PDF report."""
+
+    def __init__(self, *args: str, **kwargs: str):
+        """Create a PDF object."""
+        super().__init__(*args, **kwargs)
+        self._current_page = 1
+
+    def header(self, width: Optional[int] = 210):
+        """Create the header for the PDF."""
+        self.set_font(family="Helvetica", style="B", size=15)
+        self.set_fill_color(r=255, g=255, b=255)
+        w = self.get_string_width(s=self.title) + 6
+        self.set_x(x=(210 - w) / 2)
+        self.cell(w=w, h=9, txt=self.title, border=0, ln=1, align="L", fill=1)
+        self.ln(h=10)
+
+    def footer(self):
+        """Create the footer for the PDF."""
+        self.set_y(y=-15)
+        self.set_font(family="Helvetica", style="I", size=8)
+        self.set_text_color(r=128)
+        self.cell(
+            w=0, h=10, txt="Page " + str(self.page_no()), border=0, ln=0, align="C"
+        )
+
+    def chapter_title(self, num: int, label: str):
+        """Create a chapter title for the PDF.
+
+        Parameters
+        ----------
+        num : int
+            The chapter number.
+        label : str
+            The chapter label.
+        """
+        self.set_font(family="Helvetica", style="B", size=12)
+        self.set_fill_color(r=200, g=220, b=255)
+        self.multi_cell(w=0, h=6, txt="%d: %s" % (num, label), border=0, align="L")
+        self.ln(h=4)
+
+    def chapter_body(self, name: str, description: str, width: Optional[int] = 210):
+        """Create the body of a chapter.
+
+        Parameters
+        ----------
+        name : str
+            The name of the object.
+        description : str
+            The description of the object.
+        width : int
+            The width of the object.
+        """
+        self.set_font(family="Helvetica", style="", size=12)
+        self.multi_cell(w=0, h=5, txt=description)
+        self.image(name=name, w=width)
+        self.ln()
+
+    def print_figure(
+        self,
+        figure: ReportFigureAbstractClass,
+        width: Optional[int] = 210,
+        write_directory_path: Optional[str] = "/tmp",
+    ):
+        """Print a figure to the PDF.
+
+        Parameters
+        ----------
+        figure : ReportFigureAbstractClass
+            The figure to print.
+        width : int
+            The width of the figure.
+        height : int
+            The height of the figure.
+        """
+        self.add_page()
+        self.chapter_title(num=self._current_page, label=figure.title)
+        # Create temporary directory to write the figure and add it to the PDF
+        plotly_figure = figure.figure
+        figure_path = os.path.join(write_directory_path, f"fig{self._current_page}.png")
+        if plotly_figure:
+            plotly_figure.write_image(figure_path)
+        else:
+            df_image.export(obj=figure.data, filename=figure_path)
+        self.chapter_body(
+            name=figure_path, description=figure.description, width=int(width * 0.8)
+        )
+        self._current_page += 1
+
+    def get_html_download_link(self) -> str:
+        """Create a html download link for an object (which will be base64 encoded).
+
+        Returns
+        -------
+        str
+            The download link for the object.
+        """
+        out_filename = (
+            f"{inflection.parameterize(self.title, separator='_')}_report.pdf"
+        )
+        b64_encoded = base64.b64encode(
+            self.output(out_filename, dest="S").encode("latin-1")
+        )
+        return f'<a href="data:application/octet-stream;base64,{b64_encoded.decode()}" download="{out_filename}">Download file</a>'

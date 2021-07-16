@@ -1,7 +1,7 @@
 # .flake8
 [flake8]
 select = B,B9,BLK,C,D,DAR,E,F,I,N,RST,S,W
-ignore = B950,D205,DAR202,D415,DAR301,E203,E501,E731,RST201,RST203,RST301,RST306,W503
+ignore = B950,D205,DAR202,D415,DAR301,E203,E501,E731,RST201,RST203,RST301,RST306,S108,W503
 max-line-length = 88
 max-complexity = 15
 docstring-convention = numpy
@@ -9,4 +9,4 @@ per-file-ignores = tests/*:S101
 exclude = .nox/*
 rst-roles = class,const,func,meth,mod,ref
 rst-directives = deprecated
-application-import-names = talus_aws_utils,tests
+application-import-names = talus_standard_report,tests

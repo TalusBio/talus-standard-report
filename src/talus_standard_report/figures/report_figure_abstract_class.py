@@ -145,6 +145,16 @@ class ReportFigureAbstractClass(ABC):
         return self._figure
 
     @property
+    def data(self):
+        """Getter for data."""
+        return self._data
+
+    @property
     def subheader(self):
         """Getter for subheader."""
         return self._subheader
+
+    @property
+    def is_active(self):
+        """Getter for is_active."""
+        return self._is_active

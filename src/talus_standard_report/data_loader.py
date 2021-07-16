@@ -1,9 +1,11 @@
 """src/talus_standard_report/data_loader.py component."""
+import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
 
-from talus_aws_utils.s3 import read_dataframe, read_numpy_array
+from sklearn.decomposition import PCA
+from talus_aws_utils.s3 import read_dataframe, read_joblib
 
 from .constants import COLLECTIONS_BUCKET, ENCYCLOPEDIA_BUCKET
 
@@ -165,8 +167,8 @@ def get_quant_peptides_pca_reduced(dataset: str) -> pd.DataFrame:
 
 
 @st.cache(allow_output_mutation=True, hash_funcs={np.array: lambda _: None})
-def get_quant_peptides_pca_components(dataset: str) -> np.array:
-    """Get the quant_peptides_pca_components for the given dataset.
+def get_quant_peptides_pca(dataset: str) -> PCA:
+    """Get the quant_peptides_pca model for the given dataset.
 
     Parameters
     ----------
@@ -175,19 +177,20 @@ def get_quant_peptides_pca_components(dataset: str) -> np.array:
 
     Returns
     -------
-    pd.DataFrame
-        The quant_peptides_pca_components for the given dataset.
+    PCA
+        The quant_peptides_pca model for the given dataset.
     """
     try:
         if st.secrets.get("LOCAL_MODE"):
-            return np.load("data/quant_peptides_pca_components.npy")
+            return joblib.load("data/quant_peptides_pca.joblib")
         else:
-            return read_numpy_array(
+            # TODO: add read_joblib to aws-utils
+            return read_joblib(
                 bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/quant_peptides_pca_components.npy",
+                key=f"wide/{dataset}/quant_peptides_pca.joblib",
             )
     except ValueError:
-        return np.array([])
+        return ""
 
 
 @st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})

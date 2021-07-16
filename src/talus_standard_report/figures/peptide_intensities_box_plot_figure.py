@@ -119,7 +119,7 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
                 value=self._description_placeholder[0],
                 key=f"{self._session_key}_description",
             )
-            st.markdown(
+            left_column.markdown(
                 get_table_download_link(
                     df=self._data[0], downloads_path=self._downloads_path
                 ),
@@ -153,7 +153,7 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
                     curry(
                         df_utils.pivot_table(
                             index="PROTEIN",
-                            columns="GROUP_ORIGINAL",
+                            columns="GROUP",
                             values="ABUNDANCE",
                         )
                     ),
@@ -167,7 +167,7 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
                 value=self._description_placeholder[1],
                 key=f"{self._session_key}_description_norm",
             )
-            st.markdown(
+            right_column.markdown(
                 get_table_download_link(
                     df=self._data[1], downloads_path=self._downloads_path
                 ),

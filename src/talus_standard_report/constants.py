@@ -2,6 +2,7 @@
 from typing import Final
 
 
+STANDARD_REPORT_TITLE: Final = "Talus Standard Report"
 SELECTBOX_DEFAULT: Final = "< PICK A VALUE >"
 ENCYCLOPEDIA_BUCKET: Final = "talus-data-pipeline-encyclopedia-bucket"
 LANDING_BUCKET: Final = "talus-data-pipeline-landing-bucket"

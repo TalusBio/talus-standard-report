@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import streamlit as st
 import talus_utils.dataframe as df_utils
 
+from sklearn.decomposition import PCA
 from toolz.functoolz import curry, thread_first
 
 from talus_standard_report.constants import MAX_NUM_PEPTIDES_HEATMAP, PRIMARY_COLOR
@@ -22,7 +23,7 @@ class PeptideIntensitiesClustergram(ReportFigureAbstractClass):
 
     def __init__(
         self,
-        pca_components: np.array,
+        pca_model: PCA,
         file_to_condition: Dict[str, str],
         *args,
         **kwargs,
@@ -32,7 +33,7 @@ class PeptideIntensitiesClustergram(ReportFigureAbstractClass):
             *args,
             **kwargs,
         )
-        self._pca_components = pca_components
+        self._pca_model = pca_model
 
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the dataframe for plotting.
@@ -145,11 +146,11 @@ class PeptideIntensitiesClustergram(ReportFigureAbstractClass):
             else:
                 pca_dim = st.sidebar.selectbox(
                     "PCA Dimension",
-                    [i + 1 for i in list(range(self._pca_components.shape[0]))],
+                    [i for i in range(1, self._pca_model.components_.shape[0] + 1)],
                 )
                 most_important_features = [
                     (-np.abs(component)).argsort()[:MAX_NUM_PEPTIDES_HEATMAP]
-                    for component in self._pca_components
+                    for component in self._pca_model.components_
                 ]
                 selected_indices = most_important_features[pca_dim - 1]
 

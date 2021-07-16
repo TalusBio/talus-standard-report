@@ -19,14 +19,19 @@ Changelog = "https://github.com/rmeinl/talus-standard-report/releases"
 
 [tool.poetry.dependencies]
 python = ">=3.7.1,<4.0.0"
-streamlit = "^0.80"
+streamlit = "^0.84.1"
 watchdog = "^2.0.2"
-talus-utils = "0.1.0"
 boto3 = "^1.17.107"
 plotly = "^5.1.0"
 toolz = "^0.11.1"
 inflection = "^0.5.1"
 dash-bio = "^0.7.0"
+scikit-learn = "^0.24.2"
+talus-utils = "^0.1.4"
+talus-aws-utils = "^0.0.6"
+fpdf = "^1.7.2"
+dataframe-image = "^0.1.1"
+kaleido = "0.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
