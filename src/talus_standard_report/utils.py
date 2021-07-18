@@ -5,7 +5,7 @@ import uuid
 
 from pathlib import Path
 from shutil import rmtree
-from typing import Optional
+from typing import Optional, Tuple
 
 import dataframe_image as df_image
 import inflection
@@ -135,16 +135,38 @@ class PDF(FPDF):
         self.add_page()
         self.chapter_title(num=self._current_page, label=figure.title)
         # Create temporary directory to write the figure and add it to the PDF
-        plotly_figure = figure.figure
-        figure_path = os.path.join(write_directory_path, f"fig{self._current_page}.png")
-        if plotly_figure:
-            plotly_figure.write_image(figure_path)
+        if isinstance(figure, Tuple):
+            figures_data = []
+            for i in range(len(figure)):
+                figures_data.append(
+                    {
+                        "figure": figure[i].figure,
+                        "data": figure[i].data,
+                        "description": figure[i].description,
+                    }
+                )
         else:
-            df_image.export(obj=figure.data, filename=figure_path)
-        self.chapter_body(
-            name=figure_path, description=figure.description, width=int(width * 0.8)
-        )
-        self._current_page += 1
+            figures_data = [
+                {
+                    "figure": figure.figure,
+                    "data": figure.data,
+                    "description": figure.description,
+                }
+            ]
+        for plot_data in figures_data:
+            figure_path = os.path.join(
+                write_directory_path, f"fig{self._current_page}.png"
+            )
+            if plot_data["figure"]:
+                plot_data["figure"].write_image(figure_path)
+            else:
+                df_image.export(obj=plot_data["data"], filename=figure_path)
+            self.chapter_body(
+                name=figure_path,
+                description=plot_data["description"],
+                width=int(width * 0.8),
+            )
+            self._current_page += 1
 
     def get_html_download_link(self) -> str:
         """Create a html download link for an object (which will be base64 encoded).

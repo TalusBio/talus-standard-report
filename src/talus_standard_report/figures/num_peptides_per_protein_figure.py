@@ -74,6 +74,7 @@ class NumPeptidesPerProteinFigure(ReportFigureAbstractClass):
             color=color_array,
             color_discrete_map="identity",
             title=title,
+            nbins=MAX_NUM_PEPTIDES_PER_PROTEIN,
             width=self._width,
             height=self._height,
         )

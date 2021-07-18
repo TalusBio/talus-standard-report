@@ -10,7 +10,7 @@ from talus_aws_utils.s3 import read_dataframe, read_joblib
 from .constants import COLLECTIONS_BUCKET, ENCYCLOPEDIA_BUCKET
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_peptide_proteins_result(dataset: str) -> pd.DataFrame:
     """Get the peptide_proteins_results for the given dataset.
 
@@ -36,7 +36,7 @@ def get_peptide_proteins_result(dataset: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_peptide_proteins_normalized(dataset: str) -> pd.DataFrame:
     """Get the peptide_proteins_normalized for the given dataset.
 
@@ -62,7 +62,7 @@ def get_peptide_proteins_normalized(dataset: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_unique_peptides_proteins(dataset: str) -> pd.DataFrame:
     """Get the unique_peptides_proteins for the given dataset.
 
@@ -88,7 +88,7 @@ def get_unique_peptides_proteins(dataset: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_quant_proteins(dataset: str) -> pd.DataFrame:
     """Get the quant_proteins for the given dataset.
 
@@ -114,7 +114,7 @@ def get_quant_proteins(dataset: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_quant_peptides(dataset: str) -> pd.DataFrame:
     """Get the quant_peptides for the given dataset.
 
@@ -140,7 +140,7 @@ def get_quant_peptides(dataset: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_quant_peptides_pca_reduced(dataset: str) -> pd.DataFrame:
     """Get the quant_peptides_pca_reduced for the given dataset.
 
@@ -193,7 +193,7 @@ def get_quant_peptides_pca(dataset: str) -> PCA:
         return ""
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_nuclear_proteins() -> pd.DataFrame:
     """Get the nuclear_proteins for the given dataset.
 
@@ -216,7 +216,7 @@ def get_nuclear_proteins() -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_expected_fractions_of_locations() -> pd.DataFrame:
     """Get the expected_fractions_of_locations for the given dataset.
 
@@ -241,7 +241,7 @@ def get_expected_fractions_of_locations() -> pd.DataFrame:
         return pd.DataFrame()
 
 
-@st.cache(allow_output_mutation=True, hash_funcs={pd.DataFrame: lambda _: None})
+@st.cache(allow_output_mutation=True)
 def get_protein_locations() -> pd.DataFrame:
     """Get the protein_locations for the given dataset.
 
