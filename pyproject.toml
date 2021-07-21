@@ -57,6 +57,7 @@ sphinx-rtd-theme = "^0.5.2"
 sphinx-click = "^3.0.1"
 Pygments = "^2.9.0"
 data-science-types = "^0.2.23"
+deepdiff = "^5.5.0"
 
 [tool.poetry.scripts]
 talus-standard-report = "talus_standard_report.__main__:main"

@@ -5,7 +5,7 @@ import uuid
 
 from pathlib import Path
 from shutil import rmtree
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import dataframe_image as df_image
 import inflection
@@ -183,3 +183,39 @@ class PDF(FPDF):
             self.output(out_filename, dest="S").encode("latin-1")
         )
         return f'<a href="data:application/octet-stream;base64,{b64_encoded.decode()}" download="{out_filename}">Download file</a>'
+
+
+def get_file_to_condition_map(
+    peptide_proteins_results: pd.DataFrame, metadata: pd.DataFrame
+) -> Dict[str, str]:
+    """Create a mapping from file name to condition.
+
+    Parameters
+    ----------
+    peptide_proteins_results : pd.DataFrame
+        The results of the peptide_proteins analysis.
+    metadata : pd.DataFrame
+        The metadata for the samples.
+
+    Returns
+    -------
+    dict
+        A mapping from file name to condition.
+    """
+    file_to_condition = {}
+    metadata = metadata.loc[metadata["Acquisition Type"] == "Wide DIA"]
+    metadata["Sample No."] = metadata.groupby("Sample").cumcount() + 1
+    metadata["Condition"] = metadata.apply(
+        lambda row: f'{row["Working Compound"]}:{row["Working Cell Line"]}:{row["Sample No."]}',
+        axis=1,
+    )
+    metadata_map = (
+        metadata[["Run", "Condition"]].set_index("Run").to_dict()["Condition"]
+    )
+
+    run_ids = list(peptide_proteins_results["Run"].unique())
+    for run in run_ids:
+        run_name = run.split(".")[0]
+        file_to_condition[run_name] = metadata_map.get(run_name, run_name)
+
+    return file_to_condition

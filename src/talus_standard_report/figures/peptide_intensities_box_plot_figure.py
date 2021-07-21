@@ -153,7 +153,7 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
                     curry(
                         df_utils.pivot_table(
                             index="PROTEIN",
-                            columns="GROUP",
+                            columns="originalRUN",
                             values="ABUNDANCE",
                         )
                     ),

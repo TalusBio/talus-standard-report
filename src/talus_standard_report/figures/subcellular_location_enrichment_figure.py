@@ -37,6 +37,7 @@ class SubcellularLocationEnrichmentFigure(ReportFigureAbstractClass):
     @df_utils.update_column(
         column="PROTEIN", update_func=parse_fasta_header_uniprot_protein
     )
+    @df_utils.copy
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the data for plotting.
 

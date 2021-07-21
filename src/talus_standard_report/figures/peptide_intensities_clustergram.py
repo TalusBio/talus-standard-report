@@ -35,6 +35,7 @@ class PeptideIntensitiesClustergram(ReportFigureAbstractClass):
         )
         self._pca_model = pca_model
 
+    @df_utils.copy
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the dataframe for plotting.
 
@@ -48,11 +49,11 @@ class PeptideIntensitiesClustergram(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed dataframe.
         """
-        data = data.drop(["Protein"], axis=1)
+        data = data.drop(["Protein", "numFragments"], axis=1)
         data = data.drop_duplicates(subset="Peptide")
         data = data.set_index(["Peptide"])
         # Remove all the columns that are not present in the validation dataframe
-        data = data[list(self._file_to_condition.keys())]
+        data = data[list(self._file_to_condition.values())]
         return data
 
     def get_figure(
@@ -163,10 +164,7 @@ class PeptideIntensitiesClustergram(ReportFigureAbstractClass):
             )(
                 df=self._data,
                 selected_indices=selected_indices,
-                column_labels=[
-                    self._file_to_condition[file]
-                    for file in list(self._data.columns.values)
-                ],
+                column_labels=list(self._data.columns),
             )
 
             st.write(self._figure)

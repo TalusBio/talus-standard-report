@@ -197,11 +197,6 @@ def get_quant_peptides_pca(dataset: str) -> PCA:
 def get_nuclear_proteins() -> pd.DataFrame:
     """Get the nuclear_proteins for the given dataset.
 
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
-
     Returns
     -------
     pd.DataFrame
@@ -219,11 +214,6 @@ def get_nuclear_proteins() -> pd.DataFrame:
 @st.cache(allow_output_mutation=True)
 def get_expected_fractions_of_locations() -> pd.DataFrame:
     """Get the expected_fractions_of_locations for the given dataset.
-
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
 
     Returns
     -------
@@ -245,11 +235,6 @@ def get_expected_fractions_of_locations() -> pd.DataFrame:
 def get_protein_locations() -> pd.DataFrame:
     """Get the protein_locations for the given dataset.
 
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
-
     Returns
     -------
     pd.DataFrame
@@ -261,6 +246,32 @@ def get_protein_locations() -> pd.DataFrame:
         else:
             return read_dataframe(
                 bucket=COLLECTIONS_BUCKET, key="protein_locations.parquet"
+            )
+    except ValueError:
+        return pd.DataFrame()
+
+
+@st.cache(allow_output_mutation=True)
+def get_metadata(dataset: str) -> pd.DataFrame:
+    """Get the metadata for the given dataset.
+
+    Parameters
+    ----------
+    dataset : str
+        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
+
+    Returns
+    -------
+    pd.DataFrame
+        The metadata for the given dataset.
+    """
+    try:
+        if st.secrets.get("LOCAL_MODE"):
+            return pd.read_csv("data/benchling_metadata.csv")
+        else:
+            return read_dataframe(
+                bucket=ENCYCLOPEDIA_BUCKET,
+                key=f"wide/{dataset}/benchling_metadata.csv",
             )
     except ValueError:
         return pd.DataFrame()

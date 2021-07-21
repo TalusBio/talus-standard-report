@@ -93,11 +93,14 @@ class UniquePeptidesProteinsFigure(ReportFigureAbstractClass):
             st.header(self._title)
             if self._subheader:
                 st.subheader(self._subheader)
+            st.sidebar.header(self._short_title)
+
             self._figure = self.get_figure(
                 df=self._data,
                 color_proteins=PRIMARY_COLOR,
                 color_peptides=SECONDARY_COLOR,
             )
+
             st.write(self._figure)
             self._description = st.text_area(
                 "Description",

@@ -46,7 +46,11 @@ from talus_standard_report.figures.subcellular_location_enrichment_figure import
 from talus_standard_report.figures.unique_peptides_proteins_figure import (
     UniquePeptidesProteinsFigure,
 )
-from talus_standard_report.utils import PDF, streamlit_static_downloads_folder
+from talus_standard_report.utils import (
+    PDF,
+    get_file_to_condition_map,
+    streamlit_static_downloads_folder,
+)
 
 
 st.set_page_config(
@@ -78,13 +82,13 @@ def main() -> None:
 
     downloads_path = streamlit_static_downloads_folder()
 
+    metadata = data_loader.get_metadata(dataset=dataset)
+
     peptide_proteins_result = data_loader.get_peptide_proteins_result(dataset=dataset)
-    file_to_condition = (
-        peptide_proteins_result[["Run", "Condition"]]
-        .drop_duplicates()
-        .set_index("Run")
-        .to_dict()["Condition"]
+    file_to_condition = get_file_to_condition_map(
+        peptide_proteins_results=peptide_proteins_result, metadata=metadata
     )
+
     peptide_proteins_normalized = data_loader.get_peptide_proteins_normalized(
         dataset=dataset
     )
@@ -100,6 +104,28 @@ def main() -> None:
     nuclear_proteins = data_loader.get_nuclear_proteins()
     protein_locations = data_loader.get_protein_locations()
     expected_fractions_of_locations = data_loader.get_expected_fractions_of_locations()
+
+    # Preprocess dataframes
+    peptide_proteins_result["Condition"] = peptide_proteins_result["Condition"].apply(
+        lambda name: file_to_condition.get(name.split(".")[0], name)
+    )
+    peptide_proteins_normalized["originalRUN"] = peptide_proteins_normalized[
+        "originalRUN"
+    ].apply(lambda name: file_to_condition.get(name.split(".")[0], name))
+    unique_peptides_proteins["Sample Name"] = unique_peptides_proteins[
+        "Sample Name"
+    ].apply(lambda name: file_to_condition.get(name, name))
+    quant_proteins.columns = [
+        file_to_condition.get(name.split(".")[0], name)
+        for name in quant_proteins.columns
+    ]
+    quant_peptides.columns = [
+        file_to_condition.get(name.split(".")[0], name)
+        for name in quant_peptides.columns
+    ]
+    quant_peptides_pca_reduced["index"] = quant_peptides_pca_reduced["index"].apply(
+        lambda name: file_to_condition.get(name.split(".")[0], name)
+    )
 
     custom_protein_uploader = CustomProteinUploader()
 
