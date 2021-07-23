@@ -52,7 +52,7 @@ class SubcellularLocationEnrichmentFigure(ReportFigureAbstractClass):
             The preprocessed data.
         """
         data = data[data["ABUNDANCE"] > 0.0]
-        data = data[["PROTEIN", "originalRUN"]]
+        data = data[["PROTEIN", "GROUP"]]
         data.columns = ["Protein", "Sample"]
         data = data.drop_duplicates()
 
