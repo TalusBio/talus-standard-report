@@ -203,15 +203,22 @@ def get_file_to_condition_map(
         A mapping from file name to condition.
     """
     file_to_condition = {}
-    metadata = metadata.loc[metadata["Acquisition Type"] == "Wide DIA"]
-    metadata["Sample No."] = metadata.groupby("Sample").cumcount() + 1
-    metadata["Condition"] = metadata.apply(
-        lambda row: f'{row["Working Compound"]}:{row["Working Cell Line"]}:{row["Sample No."]}',
-        axis=1,
-    )
-    metadata_map = (
-        metadata[["Run", "Condition"]].set_index("Run").to_dict()["Condition"]
-    )
+    if not metadata.empty:
+        metadata = metadata.loc[metadata["Acquisition Type"] == "Wide DIA"]
+        metadata["Sample No."] = metadata.groupby("Sample").cumcount() + 1
+        metadata["Condition"] = metadata.apply(
+            lambda row: f'{row["Working Compound"]}:{row["Working Cell Line"]}:{row["Sample No."]}',
+            axis=1,
+        )
+        metadata_map = (
+            metadata[["Run", "Condition"]].set_index("Run").to_dict()["Condition"]
+        )
+    else:
+        metadata_map = (
+            peptide_proteins_results[["Run", "Condition"]]
+            .set_index("Run")
+            .to_dict()["Condition"]
+        )
 
     run_ids = list(peptide_proteins_results["Run"].unique())
     for run in run_ids:
