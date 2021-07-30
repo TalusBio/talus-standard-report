@@ -10,6 +10,7 @@ from typing import Dict, Optional, Tuple
 import dataframe_image as df_image
 import inflection
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
 from fpdf import FPDF
@@ -55,6 +56,26 @@ def get_table_download_link(df: pd.DataFrame, downloads_path: Path) -> str:
     temp_file_path = downloads_path.joinpath(f"{str(uuid.uuid4())}.csv")
     df.to_csv(temp_file_path)
     return f"[Download as .csv file](downloads/{os.path.basename(temp_file_path)})"
+
+
+def get_svg_download_link(fig: go.Figure, downloads_path: Path) -> str:
+    """Create a svg download link for a plotly figure.
+
+    Parameters
+    ----------
+    fig : go.Figure
+        The input figure to download.
+    downloads_path : Path
+        The path to the downloads directory.
+
+    Returns
+    -------
+    str
+        The download link for the data.
+    """
+    temp_file_path = downloads_path.joinpath(f"{str(uuid.uuid4())}.svg")
+    fig.write_image(temp_file_path)
+    return f"[Download as .svg file](downloads/{os.path.basename(temp_file_path)})"
 
 
 class PDF(FPDF):

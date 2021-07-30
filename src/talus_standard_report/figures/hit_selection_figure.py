@@ -20,7 +20,7 @@ from talus_standard_report.constants import (
     MIN_PEPTIDES_HIT_SELECTION,
     PRIMARY_COLOR,
 )
-from talus_standard_report.utils import get_table_download_link
+from talus_standard_report.utils import get_svg_download_link, get_table_download_link
 
 from .report_figure_abstract_class import ReportFigureAbstractClass
 
@@ -175,6 +175,13 @@ class HitSelectionFigure(ReportFigureAbstractClass):
             )
 
             st.write(self._figure)
+            st.markdown(
+                get_svg_download_link(
+                    fig=self._figure, downloads_path=self._downloads_path
+                ),
+                unsafe_allow_html=True,
+            )
+
             self._description = st.text_area(
                 "Description",
                 value=self._description_placeholder,

@@ -10,7 +10,7 @@ import talus_utils.plot as plot_utils
 from toolz.functoolz import curry, thread_first
 
 from talus_standard_report.constants import PRIMARY_COLOR
-from talus_standard_report.utils import get_table_download_link
+from talus_standard_report.utils import get_svg_download_link, get_table_download_link
 
 from .report_figure_abstract_class import ReportFigureAbstractClass
 
@@ -114,6 +114,13 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
                 )(df=self._data[0], color=PRIMARY_COLOR),
             )
             left_column.write(self._figure[0])
+            st.markdown(
+                get_svg_download_link(
+                    fig=self._figure[0], downloads_path=self._downloads_path
+                ),
+                unsafe_allow_html=True,
+            )
+
             self._description = left_column.text_area(
                 "Description",
                 value=self._description_placeholder[0],
@@ -162,6 +169,13 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
                 )(df=self._data[1], color=PRIMARY_COLOR),
             )
             right_column.write(self._figure[1])
+            st.markdown(
+                get_svg_download_link(
+                    fig=self._figure[1], downloads_path=self._downloads_path
+                ),
+                unsafe_allow_html=True,
+            )
+
             self._description = right_column.text_area(
                 "Description",
                 value=self._description_placeholder[1],
