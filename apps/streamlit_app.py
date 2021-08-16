@@ -109,9 +109,10 @@ def main() -> None:
     peptide_proteins_result["Condition"] = peptide_proteins_result["Condition"].apply(
         lambda name: file_to_condition.get(name.split(".")[0], name)
     )
-
     peptide_proteins_normalized["GROUP"] = peptide_proteins_normalized["GROUP"].apply(
         lambda name: file_to_condition.get(name.split(".")[0], name)
+        if isinstance(name, str)
+        else name
     )
     unique_peptides_proteins["Sample Name"] = unique_peptides_proteins[
         "Sample Name"

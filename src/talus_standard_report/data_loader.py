@@ -184,7 +184,6 @@ def get_quant_peptides_pca(dataset: str) -> PCA:
         if st.secrets.get("LOCAL_MODE"):
             return joblib.load("data/quant_peptides_pca.joblib")
         else:
-            # TODO: add read_joblib to aws-utils
             return read_joblib(
                 bucket=ENCYCLOPEDIA_BUCKET,
                 key=f"wide/{dataset}/quant_peptides_pca.joblib",
