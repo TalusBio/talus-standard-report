@@ -226,7 +226,9 @@ def get_file_to_condition_map(
     file_to_condition = {}
     if not metadata.empty:
         metadata = metadata.loc[metadata["Acquisition Type"] == "Wide DIA"]
-        metadata["Sample No."] = metadata.groupby("Sample").cumcount() + 1
+        metadata["Sample No."] = (
+            metadata.groupby(["Working Compound", "Working Cell Line"]).cumcount() + 1
+        )
         metadata["Condition"] = metadata.apply(
             lambda row: f'{row["Working Compound"]}:{row["Working Cell Line"]}:{row["Sample No."]}',
             axis=1,
