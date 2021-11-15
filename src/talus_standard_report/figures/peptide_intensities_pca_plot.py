@@ -10,6 +10,7 @@ import talus_utils.plot as plot_utils
 
 from sklearn.decomposition import PCA
 from toolz.functoolz import curry, thread_first
+from traitlets.traitlets import default
 
 from talus_standard_report.constants import PRIMARY_COLOR
 from talus_standard_report.utils import get_svg_download_link, get_table_download_link
@@ -22,9 +23,11 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
 
     def __init__(
         self,
+        metadata,
         *args,
         **kwargs,
     ):
+        self._metadata = metadata
         super().__init__(
             *args,
             **kwargs,
@@ -54,13 +57,14 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
             data_reduced,
             columns=[f"pc{n}" for n in range(1, n_components+1)],
             index=data.columns,
-        )
-        return data_reduced_df.reset_index()
+        ).reset_index()
+        return data_reduced_df
 
     def get_figure(
         self,
         df: pd.DataFrame,
         title: str = None,
+        color_by=None,
         color: str = PRIMARY_COLOR,
     ) -> go.Figure:
         """Create a Scatter plot of the PCA values using Plotly.
@@ -71,6 +75,8 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
             The input dataframe.
         title : str, optional
             The figure title, by default None
+        color_by: str, optional
+            By which column we color the dots in the plot.
         color : str, optional
             The color to use for the plot, by default PRIMARY_COLOR
 
@@ -79,14 +85,19 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
         go.Figure
             The Plotly figure.
         """
-        color_array = np.full(df.shape[0], color)
+        color_discrete_map = None
+        text = None
+        if not color_by:
+            color_by = np.full(df.shape[0], color)
+            color_discrete_map = "identity"
+            text = "index"
         return px.scatter(
             data_frame=df,
             x="pc1",
             y="pc2",
-            color=color_array,
-            color_discrete_map="identity",
-            text="index",
+            color=color_by,
+            color_discrete_map=color_discrete_map,
+            text=text,
             title=title,
             width=self._width,
             height=self._height,
@@ -98,6 +109,20 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
             st.header(self._title)
             if self._subheader:
                 st.subheader(self._subheader)
+            st.sidebar.header(self._short_title)
+
+            color_choices = list(self._metadata.columns)
+            color_choices.insert(0, None)
+            color_by = st.sidebar.selectbox(
+                "Color by", 
+                options=color_choices,
+                index=0,
+                key=f"{self._session_key}_color_by"
+            )
+            if color_by:
+                enriched_data = self._data.merge(self._metadata[["Condition", color_by]], left_on="index", right_on="Condition")
+            else:
+                enriched_data = self._data
 
             self._figure = thread_first(
                 self.get_figure,
@@ -108,7 +133,8 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
                     )
                 ),
             )(
-                df=self._data,
+                df=enriched_data,
+                color_by=color_by,
                 color=PRIMARY_COLOR,
             )
 

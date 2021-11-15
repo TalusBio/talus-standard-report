@@ -208,6 +208,7 @@ def main() -> None:
                 width=750,
                 height=750,
                 downloads_path=downloads_path,
+                metadata=metadata
             ),
         ),
     ]
