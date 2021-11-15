@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
+import talus_utils.dataframe as df_utils
 import talus_utils.plot as plot_utils
 
 from sklearn.decomposition import PCA
@@ -21,7 +22,6 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
 
     def __init__(
         self,
-        pca_model: PCA,
         *args,
         **kwargs,
     ):
@@ -29,8 +29,8 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
             *args,
             **kwargs,
         )
-        self._pca_model = pca_model
 
+    @df_utils.copy
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the data for plotting.
 
@@ -44,7 +44,18 @@ class PeptideIntensitiesPCAPlot(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed dataframe.
         """
-        return data
+        data = data.drop(["Protein", "numFragments"], axis=1)
+        data = data.set_index(["Peptide"])
+        pca_peptides = PCA(n_components=3, random_state=42)
+        data_reduced = pca_peptides.fit_transform(data.values.T)
+        self._pca_model = pca_peptides
+        n_components = data_reduced.shape[1]
+        data_reduced_df = pd.DataFrame(
+            data_reduced,
+            columns=[f"pc{n}" for n in range(1, n_components+1)],
+            index=data.columns,
+        )
+        return data_reduced_df.reset_index()
 
     def get_figure(
         self,

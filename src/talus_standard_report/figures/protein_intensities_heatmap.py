@@ -34,10 +34,7 @@ class ProteinIntensitiesHeatmap(ReportFigureAbstractClass):
         )
         self._custom_protein_uploader = custom_protein_uploader
 
-    @df_utils.explode(column="Protein", ignore_index=True, sep=";")
-    @df_utils.update_column(
-        column="Protein", update_func=parse_fasta_header_uniprot_protein
-    )
+    @df_utils.copy
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the data for plotting.
 
@@ -51,8 +48,9 @@ class ProteinIntensitiesHeatmap(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed data.
         """
-        data = data.set_index(["Protein"])
-        data = data.drop(["NumPeptides", "PeptideSequences"], axis=1)
+        protein = data["Protein"].str.extractall("\|.[^;]*\|(?P<Protein>.+?)_HUMAN").reset_index(level=[0,1]).groupby("level_0")["Protein"].apply(lambda p: ";".join(p.astype(str)))
+        data = data.set_index(protein)
+        data = data.drop(["Protein", "NumPeptides", "PeptideSequences"], axis=1)
         return data
 
     def get_figure(

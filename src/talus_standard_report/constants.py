@@ -4,10 +4,9 @@ from typing import Final
 
 STANDARD_REPORT_TITLE: Final = "Talus Standard Report"
 SELECTBOX_DEFAULT: Final = "< PICK A VALUE >"
-ENCYCLOPEDIA_BUCKET: Final = "talus-data-pipeline-encyclopedia-bucket"
-LANDING_BUCKET: Final = "talus-data-pipeline-landing-bucket"
-RAW_BUCKET: Final = "talus-data-pipeline-raw-bucket"
-COLLECTIONS_BUCKET: Final = "protein-collections"
+EXPERIMENT_BUCKET: Final = "data-pipeline-experiment-bucket"
+RAW_BUCKET: Final = "data-pipeline-raw-bucket"
+METADATA_BUCKET: Final = "data-pipeline-metadata-bucket"
 PRIMARY_COLOR: Final = "#001425"
 SECONDARY_COLOR: Final = "#308AAD"
 MAX_NUM_PEPTIDES_PER_PROTEIN: Final = 30

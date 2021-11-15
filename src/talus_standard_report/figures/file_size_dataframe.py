@@ -1,10 +1,10 @@
 """src/talus_standard_report/figures/file_sizes_dataframe.py module."""
-import os
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
-from talus_aws_utils.s3 import file_keys_in_bucket, file_size
+from talus_aws_utils.s3 import file_size
 
 from talus_standard_report.constants import RAW_BUCKET
 from talus_standard_report.utils import get_table_download_link
@@ -31,7 +31,7 @@ class FileSizeDataFrame(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed data.
         """
-        return data
+        return data[["RAW S3 Path", "Acquisition Type"]].drop_duplicates()
 
     def get_figure(self) -> pd.DataFrame:
         """Get the figure data.
@@ -41,22 +41,19 @@ class FileSizeDataFrame(ReportFigureAbstractClass):
         pd.DataFrame
             The data to plot.
         """
-        keys = [f"narrow/{self._dataset_name}", f"wide/{self._dataset_name}"]
         size_dicts = []
-        for key in keys:
-            file_keys = file_keys_in_bucket(
-                bucket=RAW_BUCKET, key=key, file_type="raw.gz"
-            )
 
-            for file_key in file_keys:
-                size = file_size(bucket=RAW_BUCKET, key=file_key)
-                size_dicts.append(
-                    {
-                        "File": os.path.basename(file_key),
-                        "Type": file_key.split("/")[0],
-                        "Size": size,
-                    }
-                )
+        for file_key, file_type in zip(self._data["RAW S3 Path"], self._data["Acquisition Type"]):
+            if not isinstance(file_key, str):
+                continue
+            size = file_size(bucket=RAW_BUCKET, key=file_key)
+            size_dicts.append(
+                {
+                    "File": Path(file_key).parts[-1],
+                    "Type": file_type,
+                    "Size": size,
+                }
+            )
         return pd.DataFrame(size_dicts).sort_values(by="File").reset_index(drop=True)
 
     def display(self) -> None:

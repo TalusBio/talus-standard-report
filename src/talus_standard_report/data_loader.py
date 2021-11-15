@@ -1,75 +1,23 @@
 """src/talus_standard_report/data_loader.py component."""
-import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
 
-from sklearn.decomposition import PCA
-from talus_aws_utils.s3 import read_dataframe, read_joblib
+from talus_aws_utils.s3 import read_dataframe
 
-from .constants import COLLECTIONS_BUCKET, ENCYCLOPEDIA_BUCKET
-
-
-@st.cache(allow_output_mutation=True)
-def get_peptide_proteins_result(dataset: str) -> pd.DataFrame:
-    """Get the peptide_proteins_results for the given dataset.
-
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
-
-    Returns
-    -------
-    pd.DataFrame
-        The peptide_proteins_results for the given dataset.
-    """
-    try:
-        if st.secrets.get("LOCAL_MODE"):
-            return pd.read_parquet("data/peptide_proteins_results.parquet")
-        else:
-            return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/peptide_proteins_results.parquet",
-            )
-    except ValueError:
-        return pd.DataFrame()
+from .constants import METADATA_BUCKET, EXPERIMENT_BUCKET
 
 
 @st.cache(allow_output_mutation=True)
-def get_peptide_proteins_normalized(dataset: str) -> pd.DataFrame:
-    """Get the peptide_proteins_normalized for the given dataset.
-
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
-
-    Returns
-    -------
-    pd.DataFrame
-        The peptide_proteins_normalized for the given dataset.
-    """
-    try:
-        if st.secrets.get("LOCAL_MODE"):
-            return pd.read_parquet("data/peptide_proteins_normalized.parquet")
-        else:
-            return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/peptide_proteins_normalized.parquet",
-            )
-    except ValueError:
-        return pd.DataFrame()
-
-
-@st.cache(allow_output_mutation=True)
-def get_unique_peptides_proteins(dataset: str) -> pd.DataFrame:
+def get_unique_peptides_proteins(dataset: str, tool: str) -> pd.DataFrame:
     """Get the unique_peptides_proteins for the given dataset.
 
     Parameters
     ----------
     dataset : str
         The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
+    tool : str
+        The name of the tool used. E.g. 'encyclopedia'.
 
     Returns
     -------
@@ -81,21 +29,23 @@ def get_unique_peptides_proteins(dataset: str) -> pd.DataFrame:
             return pd.read_parquet("data/unique_peptides_proteins.parquet")
         else:
             return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/unique_peptides_proteins.parquet",
+                bucket=EXPERIMENT_BUCKET,
+                key=f"{dataset}/{tool}/unique_peptides_proteins.csv",
             )
     except ValueError:
         return pd.DataFrame()
 
 
 @st.cache(allow_output_mutation=True)
-def get_quant_proteins(dataset: str) -> pd.DataFrame:
+def get_quant_proteins(dataset: str, tool: str) -> pd.DataFrame:
     """Get the quant_proteins for the given dataset.
 
     Parameters
     ----------
     dataset : str
         The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
+    tool : str
+        The name of the tool used. E.g. 'encyclopedia'.
 
     Returns
     -------
@@ -104,24 +54,28 @@ def get_quant_proteins(dataset: str) -> pd.DataFrame:
     """
     try:
         if st.secrets.get("LOCAL_MODE"):
-            return pd.read_csv("data/RESULTS-quant.elib.proteins.txt", sep="\t")
+            quant_proteins = pd.read_csv("data/RESULTS-quant.elib.proteins.txt", sep="\t")
         else:
-            return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/RESULTS-quant.elib.proteins.txt",
+            quant_proteins = read_dataframe(
+                bucket=EXPERIMENT_BUCKET,
+                key=f"{dataset}/{tool}/result-quant.elib.proteins.txt",
             )
+        quant_proteins.columns = [c.replace(".mzML", "") for c in quant_proteins.columns]
+        return quant_proteins
     except ValueError:
         return pd.DataFrame()
 
 
 @st.cache(allow_output_mutation=True)
-def get_quant_peptides(dataset: str) -> pd.DataFrame:
+def get_quant_peptides(dataset: str, tool: str) -> pd.DataFrame:
     """Get the quant_peptides for the given dataset.
 
     Parameters
     ----------
     dataset : str
         The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
+    tool : str
+        The name of the tool used. E.g. 'encyclopedia'.
 
     Returns
     -------
@@ -130,66 +84,16 @@ def get_quant_peptides(dataset: str) -> pd.DataFrame:
     """
     try:
         if st.secrets.get("LOCAL_MODE"):
-            return pd.read_csv("data/RESULTS-quant.elib.peptides.txt", sep="\t")
+            quant_peptides = pd.read_csv("data/RESULTS-quant.elib.peptides.txt", sep="\t")
         else:
-            return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/RESULTS-quant.elib.peptides.txt",
+            quant_peptides = read_dataframe(
+                bucket=EXPERIMENT_BUCKET,
+                key=f"{dataset}/{tool}/result-quant.elib.peptides.txt",
             )
+        quant_peptides.columns = [c.replace(".mzML", "") for c in quant_peptides.columns]
+        return quant_peptides
     except ValueError:
         return pd.DataFrame()
-
-
-@st.cache(allow_output_mutation=True)
-def get_quant_peptides_pca_reduced(dataset: str) -> pd.DataFrame:
-    """Get the quant_peptides_pca_reduced for the given dataset.
-
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
-
-    Returns
-    -------
-    pd.DataFrame
-        The quant_peptides_pca_reduced for the given dataset.
-    """
-    try:
-        if st.secrets.get("LOCAL_MODE"):
-            return pd.read_parquet("data/quant_peptides_pca_reduced.parquet")
-        else:
-            return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/quant_peptides_pca_reduced.parquet",
-            )
-    except ValueError:
-        return pd.DataFrame()
-
-
-@st.cache(allow_output_mutation=True, hash_funcs={np.array: lambda _: None})
-def get_quant_peptides_pca(dataset: str) -> PCA:
-    """Get the quant_peptides_pca model for the given dataset.
-
-    Parameters
-    ----------
-    dataset : str
-        The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
-
-    Returns
-    -------
-    PCA
-        The quant_peptides_pca model for the given dataset.
-    """
-    try:
-        if st.secrets.get("LOCAL_MODE"):
-            return joblib.load("data/quant_peptides_pca.joblib")
-        else:
-            return read_joblib(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/quant_peptides_pca.joblib",
-            )
-    except ValueError:
-        return ""
 
 
 @st.cache(allow_output_mutation=True)
@@ -205,7 +109,7 @@ def get_nuclear_proteins() -> pd.DataFrame:
         if st.secrets.get("LOCAL_MODE"):
             return pd.read_csv("data/nuclear_proteins.csv")
         else:
-            return read_dataframe(bucket=COLLECTIONS_BUCKET, key="nuclear_proteins.csv")
+            return read_dataframe(bucket=METADATA_BUCKET, key="protein-collections/nuclear_proteins.csv")
     except ValueError:
         return pd.DataFrame()
 
@@ -224,7 +128,7 @@ def get_expected_fractions_of_locations() -> pd.DataFrame:
             return pd.read_parquet("data/expected_fractions_of_locations.parquet")
         else:
             return read_dataframe(
-                bucket=COLLECTIONS_BUCKET, key="expected_fractions_of_locations.parquet"
+                bucket=METADATA_BUCKET, key="protein-collections/expected_fractions_of_locations.parquet"
             )
     except ValueError:
         return pd.DataFrame()
@@ -244,20 +148,22 @@ def get_protein_locations() -> pd.DataFrame:
             return pd.read_parquet("data/protein_locations.parquet")
         else:
             return read_dataframe(
-                bucket=COLLECTIONS_BUCKET, key="protein_locations.parquet"
+                bucket=METADATA_BUCKET, key="protein-collections/protein_locations.parquet"
             )
     except ValueError:
         return pd.DataFrame()
 
 
 @st.cache(allow_output_mutation=True)
-def get_metadata(dataset: str) -> pd.DataFrame:
+def get_metadata(dataset: str, tool: str) -> pd.DataFrame:
     """Get the metadata for the given dataset.
 
     Parameters
     ----------
     dataset : str
         The name of the dataset as it is stored in S3. E.g. '210308_MLLtx'.
+    tool : str
+        The name of the tool used. E.g. 'encyclopedia'.
 
     Returns
     -------
@@ -269,8 +175,8 @@ def get_metadata(dataset: str) -> pd.DataFrame:
             return pd.read_csv("data/benchling_metadata.csv")
         else:
             return read_dataframe(
-                bucket=ENCYCLOPEDIA_BUCKET,
-                key=f"wide/{dataset}/benchling_metadata.csv",
+                bucket=EXPERIMENT_BUCKET,
+                key=f"{dataset}/{tool}/benchling_metadata.csv",
             )
     except ValueError:
         return pd.DataFrame()

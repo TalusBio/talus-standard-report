@@ -29,6 +29,7 @@ class PeptideIntensitiesScatterMatrixFigure(ReportFigureAbstractClass):
             **kwargs,
         )
 
+    @df_utils.copy
     def preprocess_data(self, data: pd.DataFrame) -> pd.DataFrame:
         """Preprocess the data for plotting.
 
@@ -42,6 +43,8 @@ class PeptideIntensitiesScatterMatrixFigure(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed data.
         """
+        data = data.drop(["Protein", "numFragments"], axis=1)
+        data = data.set_index(["Peptide"])
         return data
 
     def get_figure(
@@ -102,14 +105,8 @@ class PeptideIntensitiesScatterMatrixFigure(ReportFigureAbstractClass):
             self._figure = thread_first(
                 self.get_figure,
                 curry(df_utils.log_scaling(filter_outliers=filter_outliers)),
-                curry(
-                    df_utils.pivot_table(
-                        index="ProteinName", columns="Condition", values="Intensity"
-                    )
-                ),
-                curry(df_utils.dropna(subset=["Intensity"])),
                 df_utils.copy,
-            )(df=self._data, color=PRIMARY_COLOR, opacity=opacity / 100)
+            )(df=self._data, color=PRIMARY_COLOR, opacity=opacity/100)
             st.write(self._figure)
             st.markdown(
                 get_svg_download_link(

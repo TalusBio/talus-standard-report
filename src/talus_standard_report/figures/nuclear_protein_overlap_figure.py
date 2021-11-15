@@ -34,9 +34,6 @@ class NuclearProteinOverlapFigure(ReportFigureAbstractClass):
         self._nuclear_proteins = nuclear_proteins
         self._custom_protein_uploader = custom_protein_uploader
 
-    @df_utils.update_column(
-        column="ProteinName", update_func=parse_fasta_header_uniprot_protein
-    )
     def preprocess_data(self, data: pd.DataFrame) -> Set:
         """Preprocess the data to be used in this figure.
 
@@ -50,7 +47,7 @@ class NuclearProteinOverlapFigure(ReportFigureAbstractClass):
         Set
             The set of proteins to be used in this figure.
         """
-        return set(data["ProteinName"])
+        return set(data["Protein"].str.extract("\|.[^;]*\|(?P<Protein>.+?)_HUMAN", expand=False))
 
     def get_figure(
         self,

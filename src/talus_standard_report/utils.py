@@ -207,14 +207,12 @@ class PDF(FPDF):
 
 
 def get_file_to_condition_map(
-    peptide_proteins_results: pd.DataFrame, metadata: pd.DataFrame
+    metadata: pd.DataFrame
 ) -> Dict[str, str]:
     """Create a mapping from file name to condition.
 
     Parameters
     ----------
-    peptide_proteins_results : pd.DataFrame
-        The results of the peptide_proteins analysis.
     metadata : pd.DataFrame
         The metadata for the samples.
 
@@ -223,9 +221,7 @@ def get_file_to_condition_map(
     dict
         A mapping from file name to condition.
     """
-    file_to_condition = {}
     if not metadata.empty:
-        metadata = metadata.loc[metadata["Acquisition Type"] == "Wide DIA"]
         metadata["Sample No."] = (
             metadata.groupby(["Working Compound", "Working Cell Line"]).cumcount() + 1
         )
@@ -237,15 +233,6 @@ def get_file_to_condition_map(
             metadata[["Run", "Condition"]].set_index("Run").to_dict()["Condition"]
         )
     else:
-        metadata_map = (
-            peptide_proteins_results[["Run", "Condition"]]
-            .set_index("Run")
-            .to_dict()["Condition"]
-        )
+        metadata_map = {}
 
-    run_ids = list(peptide_proteins_results["Run"].unique())
-    for run in run_ids:
-        run_name = run.split(".")[0]
-        file_to_condition[run_name] = metadata_map.get(run_name, run_name)
-
-    return file_to_condition
+    return metadata_map

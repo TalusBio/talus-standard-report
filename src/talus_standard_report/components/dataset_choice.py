@@ -1,6 +1,5 @@
 """src/talus_standard_report/components/dataset_choice.py module."""
-import os
-
+from pathlib import Path
 from typing import Optional
 
 import streamlit as st
@@ -31,7 +30,7 @@ class DatasetChoice:
         """
         self._dataset = None
         self._dataset_choices = [
-            os.path.basename(os.path.dirname(file))
+            Path(file).parts[0]
             for file in file_keys_in_bucket(bucket=bucket, key=key, file_type=file_type)
             if filename_filter in file
         ]
