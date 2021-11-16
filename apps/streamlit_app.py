@@ -34,6 +34,7 @@ from talus_standard_report.figures.peptide_intensities_scatter_matrix_figure imp
 from talus_standard_report.figures.protein_intensities_heatmap import (
     ProteinIntensitiesHeatmap,
 )
+from talus_standard_report.figures.peptide_intensities_box_plot_figure import PeptideIntensitiesBoxPlotFigure
 from talus_standard_report.figures.unique_peptides_proteins_figure import (
     UniquePeptidesProteinsFigure,
 )
@@ -155,6 +156,20 @@ def main() -> None:
                 height=700,
                 downloads_path=downloads_path,
                 metadata=metadata
+            ),
+        ),
+        (
+            not quant_peptides.empty,
+            PeptideIntensitiesBoxPlotFigure(
+                title="Box Plot of Peptide Intensities for each Sample",
+                short_title="Peptide Intensities Box Plot",
+                subheader="Box Plot of Peptide Intensities for each Sample",
+                dataset_name=dataset,
+                data=quant_peptides,
+                description_placeholder="A box plot showing the log2 peptide intensities for each sample/replicate. The outliers are filtered out and the ends of the box represent the lower (25th) and upper (75th) quartiles, while the median (second quartile) is marked by a line inside the box. If the distribution of one sample deviates from the others, that sample is an outlier.",
+                width=750,
+                height=900,
+                downloads_path=downloads_path,
             ),
         ),
         (

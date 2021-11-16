@@ -768,7 +768,7 @@ typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.10\"
 
 [[package]]
 name = "gopher-enrich"
-version = "0.1.dev16+g99e7e08"
+version = "0.1.dev18+g0c01516"
 description = "Gene ontology enrichment analysis using protein expression."
 category = "main"
 optional = false
@@ -780,6 +780,7 @@ biopython = "*"
 numpy = "*"
 pandas = "*"
 requests = "*"
+scipy = ">=1.7.1"
 statsmodels = "*"
 
 [package.extras]
@@ -790,7 +791,7 @@ docs = ["numpydoc (>=1.0.0)", "sphinx-argparse (>=0.2.5)", "pydata-sphinx-theme 
 type = "git"
 url = "https://github.com/TalusBio/gopher.git"
 reference = "filter_contaminants"
-resolved_reference = "99e7e081b7fe00a22689ed02e2a665547748c0b0"
+resolved_reference = "0c0151646b719848838d63ddc786f50c0c91a629"
 
 [[package]]
 name = "hurry.filesize"
@@ -2149,7 +2150,7 @@ pyarrow = ">=4.0.1,<5.0.0"
 
 [[package]]
 name = "talus-utils"
-version = "0.1.5"
+version = "0.1.6"
 description = "Talus Utils"
 category = "main"
 optional = false
@@ -2458,7 +2459,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.10"
-content-hash = "948aee18b3e2852032c3d6476605234bc6c487bc88ec6cd856042aade063da4f"
+content-hash = "81eb8daae085eefb2ec23326edade452c504b86e1cb1ac4a22c906ff8e6ee434"
 
 [metadata.files]
 aiohttp = [
@@ -4081,8 +4082,8 @@ talus-aws-utils = [
     {file = "talus_aws_utils-0.0.9-py3-none-any.whl", hash = "sha256:a366fc40d5ef41c0c950b7a743c50ec6a9934b32c9330de2ff9487f3298eb4ce"},
 ]
 talus-utils = [
-    {file = "talus-utils-0.1.5.tar.gz", hash = "sha256:5bd94ef6435bb14d1a724a7508fd3ad823386725213ca4a6a8e4231fa3a7bf4f"},
-    {file = "talus_utils-0.1.5-py3-none-any.whl", hash = "sha256:e82b8303e5e642105ad0510d032ff686780bdb1961b0bc48fb0ceaa3c202d5ad"},
+    {file = "talus-utils-0.1.6.tar.gz", hash = "sha256:a32ec2d0dadb65153c2349fd8e3acf56a0847bf39c6d1df933f40b11a2d2bdaf"},
+    {file = "talus_utils-0.1.6-py3-none-any.whl", hash = "sha256:3b5e56a5285c53bc89bcc7073403e1fa56c2bd96c8699edc8e28d2ce39b5b2e0"},
 ]
 tenacity = [
     {file = "tenacity-8.0.1-py3-none-any.whl", hash = "sha256:f78f4ea81b0fabc06728c11dc2a8c01277bfc5181b321a4770471902e3eb844a"},

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "talus-standard-report"
-version = "0.0.6"
+version = "0.0.7"
 description = "Talus Standard Report"
 authors = ["Rico Meinl <rmeinl@talus.bio>"]
 readme = "README.md"
@@ -16,7 +16,7 @@ toolz = "^0.11.1"
 inflection = "^0.5.1"
 dash-bio = "^0.7.0"
 scikit-learn = "^0.24.2"
-talus-utils = "^0.1.4"
+talus-utils = "0.1.6"
 talus-aws-utils = "0.0.9"
 fpdf = "^1.7.2"
 dataframe-image = "^0.1.1"

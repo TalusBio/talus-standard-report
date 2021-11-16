@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import talus_utils.dataframe as df_utils
-import talus_utils.plot as plot_utils
+from talus_utils.dataframe import median_normalize, quantile_normalize
 
 from toolz.functoolz import curry, thread_first
 
@@ -41,6 +41,8 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed data.
         """
+        data = data.drop(["Protein", "numFragments"], axis=1)
+        data = data.set_index(["Peptide"])
         return data
 
     def get_figure(
@@ -80,110 +82,49 @@ class PeptideIntensitiesBoxPlotFigure(ReportFigureAbstractClass):
         """Display the figure."""
         if self._is_active:
             st.header(self._title)
+            if self._subheader:
+                st.subheader(self._subheader)
             st.sidebar.header(self._short_title)
-            left_column, right_column = st.beta_columns(2)
 
-            # left column
-            if self._subheader[0]:
-                left_column.subheader(self._subheader[0])
             filter_outliers = st.sidebar.checkbox(
-                "Filter outliers (raw)", key=f"{self._session_key}_filter_outliers"
+                "Filter outliers", value=True, key=f"{self._session_key}_filter_outliers"
             )
-            self._figure = (
-                thread_first(
+            normalization_options = ["Median", "Quantile"]
+            normalization_options.insert(0, None)
+            normalization = st.sidebar.selectbox(
+                "Select Normalization", options=normalization_options, key=f"{self._session_key}_normalization"
+            )
+            plot_data = self._data
+            if normalization and normalization.lower() == "median":
+                plot_data = median_normalize(self._data)
+            elif normalization and normalization.lower() == "quantile":
+                plot_data = quantile_normalize(self._data)
+
+            self._figure = thread_first(
                     self.get_figure,
-                    curry(
-                        plot_utils.update_layout(
-                            xaxis_title="Sample",
-                            yaxis_title="log2_intensity",
-                            xaxis={"categoryorder": "category ascending"},
-                        )
-                    ),
                     curry(
                         df_utils.log_scaling(
                             log_function=np.log2, filter_outliers=filter_outliers
                         )
                     ),
-                    curry(
-                        df_utils.pivot_table(
-                            index="ProteinName", columns="Condition", values="Intensity"
-                        )
-                    ),
-                    curry(df_utils.dropna(subset=["Intensity"])),
                     df_utils.copy,
-                )(df=self._data[0], color=PRIMARY_COLOR),
-            )
-            left_column.write(self._figure[0])
+                )(df=plot_data, color=PRIMARY_COLOR)
+            st.write(self._figure)
             st.markdown(
                 get_svg_download_link(
-                    fig=self._figure[0], downloads_path=self._downloads_path
+                    fig=self._figure, downloads_path=self._downloads_path
                 ),
                 unsafe_allow_html=True,
             )
 
-            self._description = left_column.text_area(
+            self._description = st.text_area(
                 "Description",
-                value=self._description_placeholder[0],
+                value=self._description_placeholder,
                 key=f"{self._session_key}_description",
             )
-            left_column.markdown(
-                get_table_download_link(
-                    df=self._data[0], downloads_path=self._downloads_path
-                ),
-                unsafe_allow_html=True,
-            )
-
-            # right column
-            if self._subheader[1]:
-                right_column.subheader(self._subheader[1])
-            filter_outliers_norm = st.sidebar.checkbox(
-                "Filter outliers (normalized)",
-                key=f"{self._session_key}_filter_outliers_norm",
-            )
-            self._figure = (
-                self._figure[0],
-                thread_first(
-                    self.get_figure,
-                    curry(
-                        plot_utils.update_layout(
-                            xaxis_title="Sample",
-                            yaxis_title="log2_intensity",
-                            xaxis={"categoryorder": "category ascending"},
-                        )
-                    ),
-                    curry(
-                        df_utils.log_scaling(
-                            log_function=lambda x: x,
-                            filter_outliers=filter_outliers_norm,
-                        )
-                    ),
-                    curry(
-                        df_utils.pivot_table(
-                            index="PROTEIN",
-                            columns="GROUP",
-                            values="ABUNDANCE",
-                        )
-                    ),
-                    curry(df_utils.dropna(subset=["ABUNDANCE"])),
-                    df_utils.copy,
-                )(df=self._data[1], color=PRIMARY_COLOR),
-            )
-            right_column.write(self._figure[1])
             st.markdown(
-                get_svg_download_link(
-                    fig=self._figure[1], downloads_path=self._downloads_path
-                ),
-                unsafe_allow_html=True,
-            )
-
-            self._description = right_column.text_area(
-                "Description",
-                value=self._description_placeholder[1],
-                key=f"{self._session_key}_description_norm",
-            )
-            right_column.markdown(
                 get_table_download_link(
-                    df=self._data[1], downloads_path=self._downloads_path
+                    df=self._data, downloads_path=self._downloads_path
                 ),
                 unsafe_allow_html=True,
             )
