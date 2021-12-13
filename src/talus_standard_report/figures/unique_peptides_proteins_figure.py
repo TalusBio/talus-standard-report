@@ -95,6 +95,7 @@ class UniquePeptidesProteinsFigure(ReportFigureAbstractClass):
                 st.subheader(self._subheader)
             st.sidebar.header(self._short_title)
 
+            st.dataframe(self._data)
             self._figure = self.get_figure(
                 df=self._data,
                 color_proteins=PRIMARY_COLOR,

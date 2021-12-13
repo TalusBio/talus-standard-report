@@ -47,7 +47,7 @@ class NuclearProteinOverlapFigure(ReportFigureAbstractClass):
         Set
             The set of proteins to be used in this figure.
         """
-        return set(data["Protein"].str.extract("\|.[^;]*\|(?P<Protein>.+?)_HUMAN", expand=False))
+        return set(data["Protein"].str.extract("\|.[^;]*\|(?P<Protein>.+?)_*", expand=False))
 
     def get_figure(
         self,

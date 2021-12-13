@@ -48,7 +48,7 @@ class ProteinIntensitiesHeatmap(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed data.
         """
-        protein = data["Protein"].str.extractall("\|.[^;]*\|(?P<Protein>.+?)_HUMAN").reset_index(level=[0,1]).groupby("level_0")["Protein"].apply(lambda p: ";".join(p.astype(str)))
+        protein = data["Protein"].str.extractall("\|.[^;]*\|(?P<Protein>.+?)_*").reset_index(level=[0,1]).groupby("level_0")["Protein"].apply(lambda p: ";".join(p.astype(str)))
         data = data.set_index(protein)
         data = data.drop(["Protein", "NumPeptides", "PeptideSequences"], axis=1)
         return data
