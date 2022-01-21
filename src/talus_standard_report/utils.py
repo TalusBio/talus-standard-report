@@ -221,7 +221,7 @@ def get_file_to_condition_map(
     dict
         A mapping from file name to condition.
     """
-    if not metadata.empty:
+    try:
         metadata["Sample No."] = (
             metadata.groupby(["Working Compound", "Working Cell Line"]).cumcount() + 1
         )
@@ -232,7 +232,7 @@ def get_file_to_condition_map(
         metadata_map = (
             metadata[["Run", "Condition"]].set_index("Run").to_dict()["Condition"]
         )
-    else:
+    except:
         metadata_map = {}
 
     return metadata_map
