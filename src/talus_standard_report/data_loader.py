@@ -28,10 +28,21 @@ def get_unique_peptides_proteins(dataset: str, tool: str) -> pd.DataFrame:
         if st.secrets.get("LOCAL_MODE"):
             return pd.read_parquet("data/unique_peptides_proteins.parquet")
         else:
-            return read_dataframe(
-                bucket=EXPERIMENT_BUCKET,
-                key=f"{dataset}/{tool}/unique_peptides_proteins.csv",
-            )
+            try:
+                unique_peptides_proteins = read_dataframe(
+                    bucket=EXPERIMENT_BUCKET,
+                    key=f"{dataset}/{tool}/quant_unique_peptides_proteins.csv",
+                )
+                unique_peptides_proteins = unique_peptides_proteins.rename(columns={
+                    "Run": "Sample Name"
+                })
+                return unique_peptides_proteins
+            except:
+                print("No quant_* unique peptides available. Must be old version.")
+                return read_dataframe(
+                    bucket=EXPERIMENT_BUCKET,
+                    key=f"{dataset}/{tool}/unique_peptides_proteins.csv",
+                )
     except ValueError:
         return pd.DataFrame()
 
