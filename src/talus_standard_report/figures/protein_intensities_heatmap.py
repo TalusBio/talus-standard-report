@@ -48,9 +48,11 @@ class ProteinIntensitiesHeatmap(ReportFigureAbstractClass):
         pd.DataFrame
             The preprocessed data.
         """
-        protein = data["Protein"].str.extractall("\|.[^;]*\|(?P<Protein>.+?)_*").reset_index(level=[0,1]).groupby("level_0")["Protein"].apply(lambda p: ";".join(p.astype(str)))
-        data = data.set_index(protein)
-        data = data.drop(["Protein", "NumPeptides", "PeptideSequences"], axis=1)
+        # This suddenly stopped working
+        # protein = data["Protein"].str.extractall("\|.[^;]*\|(?P<Protein>.+?)_*").reset_index(level=[0,1]).groupby("level_0")["Protein"].apply(lambda p: ";".join(p.astype(str)))
+        data["Protein"] = data["Protein"].apply(lambda p: p.split("|")[-1].split("_")[0])
+        data = data.drop(columns=["NumPeptides", "PeptideSequences"], axis=1)
+        data = data.set_index("Protein")
         return data
 
     def get_figure(
@@ -133,7 +135,7 @@ class ProteinIntensitiesHeatmap(ReportFigureAbstractClass):
 
             self._figure = thread_first(
                 self.get_figure,
-                curry(df_utils.sort_row_values(how="max")),
+                # curry(df_utils.sort_row_values(how="max")),
                 curry(normalize_func),
                 df_utils.copy,
             )(df=self._data, start_index=start_index, custom_proteins=custom_proteins)
