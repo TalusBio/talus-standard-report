@@ -89,16 +89,23 @@ class GOEnrichmentFigure(ReportFigureAbstractClass):
                 st.subheader(self._subheader)
             st.sidebar.header(self._short_title)
 
-            extraction_fractions = st.sidebar.multiselect(
-                "Extraction Fractions", 
-                options=set(self._metadata["Extraction Fraction"]),
-                key=f"{self._session_key}_extraction_fractions"
-            )
-            working_compounds = st.sidebar.multiselect(
-                "Working Compounds", 
-                options=set(self._metadata["Working Compound"]),
-                key=f"{self._session_key}_working_compound"
-            )
+            if "Extraction Fraction" in self._metadata:
+                extraction_fractions = st.sidebar.multiselect(
+                    "Extraction Fractions", 
+                    options=set(self._metadata["Extraction Fraction"]),
+                    key=f"{self._session_key}_extraction_fractions"
+                )
+            else: 
+                extraction_fractions = []
+            if "Working Compound" in self._metadata:
+                working_compounds = st.sidebar.multiselect(
+                    "Working Compounds", 
+                    options=set(self._metadata["Working Compound"]),
+                    key=f"{self._session_key}_working_compound"
+                )
+            else:
+                working_compounds = []
+
             go_filter_options = [
                 "nucleus", 
                 "nuclear chromosome", 
@@ -120,7 +127,10 @@ class GOEnrichmentFigure(ReportFigureAbstractClass):
                 key=f"{self._session_key}_go_filters"
             )
 
-            subset_df = self._data[self._data.columns.intersection(list(self._metadata[(self._metadata["Extraction Fraction"].isin(extraction_fractions)) & (self._metadata["Working Compound"].isin(working_compounds))]["Condition"].unique()))]
+            if "Extraction Fraction" in self._metadata and "Working Compound" in self._metadata:
+                subset_df = self._data[self._data.columns.intersection(list(self._metadata[(self._metadata["Extraction Fraction"].isin(extraction_fractions)) & (self._metadata["Working Compound"].isin(working_compounds))]["Condition"].unique()))]
+            else:
+                subset_df = self._data
             if not subset_df.empty:
                 go_enrichment = gopher.test_enrichment(
                     subset_df,
